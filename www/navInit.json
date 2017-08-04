@@ -1,0 +1,131 @@
+{
+    "menu1": {
+        "text": {
+            "ch": "开始前必读",
+            "en": "Starts"
+        },
+        "navActive": true,
+        "hasNext": true,
+        "nextLength": 3,
+        "next": {
+            "menu1_1": {
+                "text": {
+                    "ch": "介绍",
+                    "en": "Introduction"
+                },
+                "hasNext": false,
+                "path": "/",
+                "liActive": 11
+            },
+            "menu1_2": {
+                "text": {
+                    "ch": "公众号接口权限说明",
+                    "en": "Public address interface"
+                },
+                "hasNext": false,
+                "path": "/content2",
+                "liActive": 12
+            },
+            "menu1_3": {
+                "text": {
+                    "ch": "入门指引",
+                    "en": "Getting Started Guide"
+                },
+                "hasNext": true,
+                "navActive": false,
+                "nextLength": 1,
+                "next": {
+                    "menu1_3_1": {
+                        "text": {
+                            "ch": "内容",
+                            "en": "Content"
+                        },
+                        "hasNext": false,
+                        "liActive": 131,
+                        "path": "/content3"
+                    }
+                }
+            }
+        }
+    },
+    "menu2": {
+        "text": {
+            "ch": "开始开发",
+            "en": "head2"
+        },
+        "navActive": false,
+        "hasNext": true,
+        "nextLength": 1,
+        "next": {
+            "menu2_1": {
+                "text": {
+                    "ch": "内容四",
+                    "en": "Content4"
+                },
+                "hasNext": false,
+                "path": "/content4",
+                "liActive": 21
+            }
+        }
+    },
+    "menu3": {
+        "text": {
+            "ch": "自定义菜单",
+            "en": "MainBody"
+        },
+        "navActive": false,
+        "hasNext": true,
+        "nextLength": 1,
+        "next": {
+            "menu3_1": {
+                "text": {
+                    "ch": "内容五",
+                    "en": "content5"
+                },
+                "hasNext": false,
+                "path": "/content5",
+                "liActive": 31
+            }
+        }
+    },
+    "menu4": {
+        "text": {
+            "ch": "素材管理",
+            "en": "Footer"
+        },
+        "navActive": false,
+        "hasNext": true,
+        "nextLength": 1,
+        "next": {
+            "menu4_1": {
+                "text": {
+                    "ch": "内容六",
+                    "en": "content6"
+                },
+                "hasNext": false,
+                "path": "/content6",
+                "liActive": 41
+            }
+        }
+    },
+    "menu5": {
+        "text": {
+            "ch": "用户管理",
+            "en": "Footer2"
+        },
+        "navActive": false,
+        "hasNext": true,
+        "nextLength": 1,
+        "next": {
+            "menu5_1": {
+                "text": {
+                    "ch": "内容七",
+                    "en": "content7"
+                },
+                "hasNext": false,
+                "path": "/content7",
+                "liActive": 51
+            }
+        }
+    }
+}
