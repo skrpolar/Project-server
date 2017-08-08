@@ -4,7 +4,7 @@
             "ch": "开始前必读",
             "en": "Starts"
         },
-        "navActive": true,
+        "navActive": false,
         "hasNext": true,
         "nextLength": 3,
         "next": {
@@ -127,5 +127,14 @@
                 "liActive": 51
             }
         }
+    },
+    "menu6": {
+        "text": {
+            "ch": "标题六",
+            "en": "Menu6"
+        },
+        "hasNext": false,
+        "path": "/menu6",
+        "liActive": 6
     }
 }

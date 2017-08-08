@@ -2,36 +2,37 @@ var express = require('express');
 var fs = require('fs');
 var app = express();
 var server = require('http').createServer(app);
-// var router = express.Router();
+var router = express.Router();
+var marked = require('marked');
 
-app.use('/getnavbar', function (req, res) {
-    var s = JSON.parse(fs.readFileSync('./www/navInit.json', 'utf8'));
-    console.log(s);
-    // res.header('Access-Control-Allow-Origin', '*');
-    res.jsonp(s);
+marked.setOptions({
+    renderer: new marked.Renderer(),
+    gfm: true,
+    tables: true,
+    breaks: false,
+    pedantic: false,
+    sanitize: false,
+    smartLists: true,
+    smartypants: false
 });
 
 
-// var marked = require('marked');
-// console.log(marked('I am using __markdown__.'));
+app.use('/', express.static(__dirname + '/vuewebpack'));
 
-// app.use('/', express.static(__dirname + '/www'));
+router.get('/getnavbar', function (req, res) {
+    var s = JSON.parse(fs.readFileSync('./www/navInit.json', 'utf8'));
+    res.jsonp(s);
+});
 
-// router.get('/getnavbar',function(req, res) {
-//     var s = JSON.parse(fs.readFileSync('./www/navInit.json'));
-//     console.log(s);
-//     // res.header('Access-Control-Allow-Origin','*');
-//     res.send(s);
-// });
+router.get('/getmarkdown', function (req, res) {
+    fs.readFile('./www/gitbook.md', 'utf8', function (err, data) {
+        res.setHeader('Access-Control-Allow-Origin', '*');
+        res.send(data);
+        console.log(data);
+    });
+    // res.send(md);
+});
 
-// router.get('/getMarkDown',function(req, res) {
-//     fs.readFile('./www/gitbook.md','utf8',function(err, data) {
-//         res.send(marked(data));
-//         console.log(marked(data));
-//     });
-//     // res.send(md);
-// });
-
-// app.use(router);
+app.use(router);
 
 server.listen(90);

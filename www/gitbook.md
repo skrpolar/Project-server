@@ -1,59 +1,66 @@
-[![GitBook](https://raw.github.com/GitbookIO/gitbook/master/docs/images/banner.png)](https://www.gitbook.com)
+# [React](https://facebook.github.io/react/) &middot; [![CircleCI Status](https://circleci.com/gh/facebook/react.svg?style=shield&circle-token=:circle-token)](https://circleci.com/gh/facebook/react) [![Coverage Status](https://img.shields.io/coveralls/facebook/react/master.svg?style=flat)](https://coveralls.io/github/facebook/react?branch=master) [![npm version](https://img.shields.io/npm/v/react.svg?style=flat)](https://www.npmjs.com/package/react) [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](CONTRIBUTING.md#pull-requests)
 
-<p align="center">A <em>modern</em> customizable documentation format and toolchain</p>
+React is a JavaScript library for building user interfaces.
 
+* **Declarative:** React makes it painless to create interactive UIs. Design simple views for each state in your application, and React will efficiently update and render just the right components when your data changes. Declarative views make your code more predictable, simpler to understand, and easier to debug.
+* **Component-Based:** Build encapsulated components that manage their own state, then compose them to make complex UIs. Since component logic is written in JavaScript instead of templates, you can easily pass rich data through your app and keep state out of the DOM.
+* **Learn Once, Write Anywhere:** We don't make assumptions about the rest of your technology stack, so you can develop new features in React without rewriting existing code. React can also render on the server using Node and power mobile apps using [React Native](https://facebook.github.io/react-native/).
 
-<p align="center"><a href="#features"><strong>Features</strong></a> · <a href="https://www.gitbook.com"><strong>Hosting</strong></a> · <a href="http://redux.js.org/"><strong>Example</strong></a> · <a href="https://www.gitbook.com/editor"><strong>Editor</strong></a> · <a href="https://toolchain.gitbook.com/"><strong>Documentation</strong></a> · <a href="./CONTRIBUTING.md"><strong>Contributing!</strong></a> · <a href="https://twitter.com/GitBookIO"><strong>Twitter</strong></a></p>
-<br/>
+[Learn how to use React in your own project](https://facebook.github.io/react/docs/getting-started.html).
 
-![Preview](https://raw.github.com/GitbookIO/gitbook/master/docs/images/preview.png)
+## Examples
 
+We have several examples [on the website](https://facebook.github.io/react/). Here is the first one to get you started:
 
-<p align="center">
-<img src="https://badge.fury.io/js/gitbook.svg" />
-<a href="https://travis-ci.org/GitbookIO/gitbook"><img src="https://travis-ci.org/GitbookIO/gitbook.png?branch=master" /></a>
-<a href="https://ci.appveyor.com/project/GitBook/gitbook"><img src="https://ci.appveyor.com/api/projects/status/63nlflxcwmb2pue6?svg=true" /></a>
-<a href="https://slack.gitbook.com"><img src="https://slack.gitbook.com/badge.svg" /></a>
-</p>
+```javascript
+class HelloMessage extends React.Component {
+  render() {
+    return <div>Hello {this.props.name}</div>;
+  }
+}
 
-GitBook is a command line tool (and Node.js library) for building beautiful books using GitHub/Git and Markdown (or AsciiDoc). Here is an example: [ReduxJS documentation](http://redux.js.org/).
+ReactDOM.render(
+  <HelloMessage name="John" />,
+  document.getElementById('container')
+);
+```
 
-You can publish and host books easily online using [gitbook.com](https://www.gitbook.com). A desktop editor is [also available](https://www.gitbook.com/editor).
+This example will render "Hello John" into a container on the page.
 
-Check out the [GitBook Community Slack Channel](https://slack.gitbook.com), Stay updated by following [@GitBookIO](https://twitter.com/GitBookIO) on Twitter or [GitBook](https://www.facebook.com/gitbookcom) on Facebook.
+You'll notice that we used an HTML-like syntax; [we call it JSX](https://facebook.github.io/react/docs/introducing-jsx.html). JSX is not required to use React, but it makes code more readable, and writing it feels like writing HTML. We recommend using [Babel](https://babeljs.io/) with a [React preset](https://babeljs.io/docs/plugins/preset-react/) to convert JSX into native JavaScript for browsers to digest.
 
-Complete documentation is available at [toolchain.gitbook.com](http://toolchain.gitbook.com/).
+## Installation
 
-## Getting started
+React is available as the `react` package on [npm](https://www.npmjs.com/). It is also available on a [CDN](https://facebook.github.io/react/docs/installation.html#using-a-cdn).
 
-GitBook can be used either on your computer for building local books or on GitBook.com for hosting them. To get started, check out [the installation instructions in the documentation](docs/setup.md).
+React is flexible and can be used in a variety of projects. You can create new apps with it, but you can also gradually introduce it into an existing codebase without doing a rewrite.
 
-## Usage examples
+The recommended way to install React depends on your project. Here you can find short guides for the most common scenarios:
 
-GitBook can be used to create book, public documentation, enterprise manual, thesis, research papers, etc.
+* [Trying Out React](https://facebook.github.io/react/docs/installation.html#trying-out-react)
+* [Creating a New Application](https://facebook.github.io/react/docs/installation.html#creating-a-new-application)
+* [Adding React to an Existing Application](https://facebook.github.io/react/docs/installation.html#adding-react-to-an-existing-application)
 
-You can find a [list of real-world examples](docs/examples.md) in the documentation.
+## Contributing
 
-## Help and Support
+The main purpose of this repository is to continue to evolve React core, making it faster and easier to use. Development of React happens in the open on GitHub, and we are grateful to the community for contributing bugfixes and improvements. Read below to learn how you can take part in improving React.
 
-We're always happy to help out with your books or any other questions you might have. You can ask a question on the following contact form at [gitbook.com/contact](https://www.gitbook.com/contact) or signal an issue on [GitHub](https://github.com/GitbookIO/gitbook).
+### [Code of Conduct](https://code.facebook.com/codeofconduct)
 
-## Features
+Facebook has adopted a Code of Conduct that we expect project participants to adhere to. Please read [the full text](https://code.facebook.com/codeofconduct) so that you can understand what actions will and will not be tolerated.
 
-* Write using [Markdown](http://toolchain.gitbook.com/syntax/markdown.html) or [AsciiDoc](http://toolchain.gitbook.com/syntax/asciidoc.html)
-* Output as a website or [ebook (pdf, epub, mobi)](http://toolchain.gitbook.com/ebook.html)
-* [Multi-Languages](http://toolchain.gitbook.com/languages.html)
-* [Lexicon / Glossary](http://toolchain.gitbook.com/lexicon.html)
-* [Cover](http://toolchain.gitbook.com/ebook.html)
-* [Variables and Templating](http://toolchain.gitbook.com/templating/)
-* [Content References](http://toolchain.gitbook.com/templating/conrefs.html)
-* [Plugins](http://toolchain.gitbook.com/plugins/)
-* [Beautiful default theme](https://github.com/GitbookIO/theme-default)
+### Contributing Guide
 
-## Publish your book
+Read our [contributing guide](https://facebook.github.io/react/contributing/how-to-contribute.html) to learn about our development process, how to propose bugfixes and improvements, and how to build and test your changes to React.
 
-The platform [GitBook.com](https://www.gitbook.com/) is like an "Heroku for books": you can create a book on it (public, or private) and update it using **git push**.
+### Beginner Friendly Bugs
 
-## Licensing
+To help you get your feet wet and get you familiar with our contribution process, we have a list of [beginner friendly bugs](https://github.com/facebook/react/labels/Difficulty%3A%20beginner) that contain bugs which are fairly easy to fix. This is a great place to get started.
 
-GitBook is licensed under the Apache License, Version 2.0. See [LICENSE](LICENSE) for the full license text.
+### License
+
+React is [BSD licensed](./LICENSE). We also provide an additional [patent grant](./PATENTS).
+
+React documentation is [Creative Commons licensed](./LICENSE-docs).
+
+Examples provided in this repository and in the documentation are [separately licensed](./LICENSE-examples).
