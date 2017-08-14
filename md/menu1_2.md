@@ -1,310 +1,317 @@
-<img src="https://dl.dropboxusercontent.com/u/6396913/koa/logo.png" alt="koa middleware framework for nodejs" width="255px" />
+# Chromeless [![npm version](https://badge.fury.io/js/chromeless.svg)](https://badge.fury.io/js/chromeless) [![CircleCI](https://circleci.com/gh/graphcool/chromeless.svg?style=svg)](https://circleci.com/gh/graphcool/chromeless)
 
-  [![gitter][gitter-image]][gitter-url]
-  [![NPM version][npm-image]][npm-url]
-  [![build status][travis-image]][travis-url]
-  [![Test coverage][coveralls-image]][coveralls-url]
-  [![OpenCollective Backers][backers-image]](#backers)
-  [![OpenCollective Sponsors][sponsors-image]](#sponsors)
+Chrome automation made simple. Runs locally or headless on AWS Lambda. (**[See Demo](https://chromeless.netlify.com/)**)
 
-  Expressive HTTP middleware framework for node.js to make web applications and APIs more enjoyable to write. Koa's middleware stack flows in a stack-like manner, allowing you to perform actions downstream then filter and manipulate the response upstream.
+## Chromeless can be used to...
 
-  Only methods that are common to nearly all HTTP servers are integrated directly into Koa's small ~570 SLOC codebase. This
-  includes things like content negotiation, normalization of node inconsistencies, redirection, and a few others.
+* Run 1000s of **browser integration tests in parallel** ⚡️
+* Crawl the web & automate screenshots
+* Write bots that require a real browser
+* *Do pretty much everything you've used __PhantomJS, NightmareJS or Selenium__ for before*
 
-  Koa is not bundled with any middleware.
+### Examples
+
+* [JSON of Google Results](examples/extract-google-results.js): Google for `chromeless` and get a list of JSON results
+* [Screenshot of Google Results](examples/google-screenshot.js): Google for `chromeless` and take a screenshot of the results
+* [prep](https://github.com/graphcool/prep): Compile-time prerendering for SPA/PWA (like React, Vue...) instead of server-side rendering (SSR)
+* *See the full [examples list](/examples) for more*
+
+## ▶️ Try it out
+
+You can try out Chromeless and explore the API in the browser-based **[demo playground](https://chromeless.netlify.com/)** ([source](https://github.com/graphcool/chromeless-playground)).
+
+[![](http://i.imgur.com/i1gtCzy.png)](https://chromeless.netlify.com/)
+
+## Contents
+1. [How it works](#how-it-works)
+1. [Installation](#installation)
+1. [Usage](#usage)
+1. [API Documentation](#api-documentation)
+1. [Configuring Development Environment](#configuring-development-environment)
+1. [FAQ](#faq)
+1. [Contributors](#contributors)
+1. [Credits](#credits)
+1. [Help & Community](#help-and-community)
+
+## How it works
+
+With Chromeless you can control Chrome (open website, click elements, fill out forms...) using an [elegant API](docs/api.md). This is useful for integration tests or any other scenario where you'd need to script a real browser.
+
+### There are 2 ways to use Chromeless
+
+1. Running Chrome on your local computer
+2. Running Chrome on AWS Lambda and controlling it remotely
+
+![](http://imgur.com/2bgTyAi.png)
+
+### 1. Local Setup
+
+For local development purposes where a fast feedback loop is necessary, the easiest way to use Chromeless is by controlling your local Chrome browser. Just follow the [usage guide](#usage) to get started.
+
+### 2. Remote Proxy Setup
+
+You can also run Chrome in [headless-mode](https://developers.google.com/web/updates/2017/04/headless-chrome) on AWS Lambda. This way you can speed up your tests by running them in parallel. (In [Graphcool](https://www.graph.cool/)'s case this decreased test durations from ~20min to a few seconds.)
+
+Chromeless comes out of the box with a remote proxy built-in - the usage stays completely the same. This way you can write and run your tests locally and have them be executed remotely on AWS Lambda. The proxy connects to Lambda through a Websocket connection to forward commands and return the evaluation results.
 
 ## Installation
-
-Koa requires __node v7.6.0__ or higher for ES2015 and async function support.
-
-```
-$ npm install koa
+```sh
+npm install chromeless
 ```
 
-## Hello koa
+### Proxy Setup
+
+The project contains a [Serverless](https://serverless.com/) service for running and driving Chrome remotely on AWS Lambda.
+
+1. Deploy The Proxy service to AWS Lambda. More details [here](serverless#setup)
+2. Follow the usage instructions [here](serverless#using-the-proxy).
+
+
+## Usage
+
+Using Chromeless is similar to other browser automation tools. For example:
 
 ```js
-const Koa = require('koa');
-const app = new Koa();
+const { Chromeless } = require('chromeless')
 
-// response
-app.use(ctx => {
-  ctx.body = 'Hello Koa';
-});
+async function run() {
+  const chromeless = new Chromeless()
 
-app.listen(3000);
-```
+  const screenshot = await chromeless
+    .goto('https://www.google.com')
+    .type('chromeless', 'input[name="q"]')
+    .press(13)
+    .wait('#resultStats')
+    .screenshot()
 
-## Getting started
+  console.log(screenshot) // prints local file path or S3 url
 
- - [Kick-Off-Koa](https://github.com/koajs/kick-off-koa) - An intro to koa via a set of self-guided workshops.
- - [Workshop](https://github.com/koajs/workshop) - A workshop to learn the basics of koa, Express' spiritual successor.
- - [Introduction Screencast](http://knowthen.com/episode-3-koajs-quickstart-guide/) - An introduction to installing and getting started with Koa
-
-
-## Middleware
-
-Koa is a middleware framework that can take two different kinds of functions as middleware:
-
-  * async function
-  * common function
-
-Here is an example of logger middleware with each of the different functions:
-
-### ___async___ functions (node v7.6+)
-
-```js
-app.use(async (ctx, next) => {
-  const start = Date.now();
-  await next();
-  const ms = Date.now() - start;
-  console.log(`${ctx.method} ${ctx.url} - ${ms}ms`);
-});
-```
-
-### Common function
-
-```js
-// Middleware normally takes two parameters (ctx, next), ctx is the context for one request,
-// next is a function that is invoked to execute the downstream middleware. It returns a Promise with a then function for running code after completion.
-
-app.use((ctx, next) => {
-  const start = Date.now();
-  return next().then(() => {
-    const ms = Date.now() - start;
-    console.log(`${ctx.method} ${ctx.url} - ${ms}ms`);
-  });
-});
-```
-
-### Koa v1.x Middleware Signature
-
-The middleware signature changed between v1.x and v2.x.  The older signature is deprecated.
-
-**Old signature middleware support will be removed in v3**
-
-Please see the [Migration Guide](docs/migration.md) for more information on upgrading from v1.x and
-using v1.x middleware with v2.x.
-
-## Context, Request and Response
-
-Each middleware receives a Koa `Context` object that encapsulates an incoming
-http message and the corresponding response to that message.  `ctx` is often used
-as the parameter name for the context object.
-
-```js
-app.use(async (ctx, next) => { await next(); });
-```
-
-Koa provides a `Request` object as the `request` property of the `Context`.  
-Koa's `Request` object provides helpful methods for working with
-http requests which delegate to an [IncomingMessage](https://nodejs.org/api/http.html#http_class_http_incomingmessage)
-from the node `http` module.
-
-Here is an example of checking that a requesting client supports xml.
-
-```js
-app.use(async (ctx, next) => {
-  ctx.assert(ctx.request.accepts('xml'), 406);
-  // equivalent to:
-  // if (!ctx.request.accepts('xml')) ctx.throw(406);
-  await next();
-});
-```
-
-Koa provides a `Response` object as the `response` property of the `Context`.  
-Koa's `Response` object provides helpful methods for working with
-http responses which delegate to a [ServerResponse](https://nodejs.org/api/http.html#http_class_http_serverresponse)
-.  
-
-Koa's pattern of delegating to Node's request and response objects rather than extending them
-provides a cleaner interface and reduces conflicts between different middleware and with Node
-itself as well as providing better support for stream handling.  The `IncomingMessage` can still be
-directly accessed as the `req` property on the `Context` and `ServerResponse` can be directly
-accessed as the `res` property on the `Context`.
-
-Here is an example using Koa's `Response` object to stream a file as the response body.
-
-```js
-app.use(async (ctx, next) => {
-  await next();
-  ctx.response.type = 'xml';
-  ctx.response.body = fs.createReadStream('really_large.xml');
-});
-```
-
-The `Context` object also provides shortcuts for methods on its `request` and `response`.  In the prior
-examples,  `ctx.type` can be used instead of `ctx.request.type` and `ctx.accepts` can be used
-instead of `ctx.request.accepts`.
-
-For more information on `Request`, `Response` and `Context`, see the [Request API Reference](docs/api/request.md),
-[Response API Reference](docs/api/response.md) and [Context API Reference](docs/api/context.md).
-
-## Koa Application
-
-The object created when executing `new Koa()` is known as the Koa application object.
-
-The application object is Koa's interface with node's http server and handles the registration
-of middleware, dispatching to the middleware from http, default error handling, as well as
-configuration of the context, request and response objects.
-
-Learn more about the application object in the [Application API Reference](docs/api/index.md).
-
-## Documentation
-
- - [Usage Guide](docs/guide.md)
- - [Error Handling](docs/error-handling.md)
- - [Koa for Express Users](docs/koa-vs-express.md)
- - [FAQ](docs/faq.md)
- - [API documentation](docs/api/index.md)
-
-## Babel setup
-
-If you're not using `node v7.6+`, we recommend setting up `babel` with [`babel-preset-env`](https://github.com/babel/babel-preset-env):
-
-```bash
-$ npm install babel-register babel-preset-env --save
-```
-
-Setup `babel-register` in your entry file:
-
-```js
-require('babel-register');
-```
-
-And have your `.babelrc` setup:
-
-```json
-{
-  "presets": [
-    ["env", {
-      "targets": {
-        "node": true
-      }
-    }]
-  ]
+  await chromeless.end()
 }
+
+run().catch(console.error.bind(console))
 ```
+
+### Local Chrome Usage
+
+To run Chromeless locally, you need a recent version of Chrome or Chrome Canary installed (version 60 or greater). By default, chromeless will start Chrome automatically and will default to the most recent version found on your system if there's multiple. You can override this behavior by starting Chrome yourself, and passing a flag of `launchChrome: false` in the `Chromeless` constructor.
+
+To launch Chrome yourself, and open the port for chromeless, follow this example:
+
+```sh
+alias canary="/Applications/Google\ Chrome\ Canary.app/Contents/MacOS/Google\ Chrome\ Canary"
+canary --remote-debugging-port=9222
+```
+
+Or run Chrome Canary headless-ly:
+
+```sh
+canary --remote-debugging-port=9222 --disable-gpu --headless
+```
+
+Or run Chrome headless-ly on Windows:
+
+```sh
+cd "C:\Program Files (x86)\Google\Chrome\Application"
+chrome --remote-debugging-port=9222 --disable-gpu --headless
+```
+
+### Proxy Usage
+
+Follow the setup instructions [here](serverless#installation).
+
+Then using Chromeless with the Proxy service is the same as running it locally with the exception of the `remote` option.
+Alternatively you can configure the Proxy service's endpoint with environment variables. [Here's how](serverless#using-the-proxy).
+```js
+const chromeless = new Chromeless({
+  remote: {
+    endpointUrl: 'https://XXXXXXXXXX.execute-api.eu-west-1.amazonaws.com/dev'
+    apiKey: 'your-api-key-here'
+  },
+})
+```
+
+## API Documentation
+
+**Chromeless methods**
+- [`end()`](docs/api.md#api-end)
+
+**Chrome methods**
+- [`goto(url: string)`](docs/api.md#api-goto)
+- [`setUserAgent(useragent: string)`](docs/api.md#api-setUserAgent)
+- [`click(selector: string)`](docs/api.md#api-click)
+- [`wait(timeout: number)`](docs/api.md#api-wait-timeout)
+- [`wait(selector: string)`](docs/api.md#api-wait-selector)
+- [`wait(fn: (...args: any[]) => boolean, ...args: any[])`] - Not implemented yet
+- [`clearCache()`](docs/api.md#api-clearcache)
+- [`focus(selector: string)`](docs/api.md#api-focus)
+- [`press(keyCode: number, count?: number, modifiers?: any)`](docs/api.md#api-press)
+- [`type(input: string, selector?: string)`](docs/api.md#api-type)
+- [`back()`](docs/api.md#api-back) - Not implemented yet
+- [`forward()`](docs/api.md#api-forward) - Not implemented yet
+- [`refresh()`](docs/api.md#api-refresh) - Not implemented yet
+- [`mousedown(selector: string)`](docs/api.md#api-mousedown)
+- [`mouseup(selector: string)`](docs/api.md#api-mouseup)
+- [`scrollTo(x: number, y: number)`](docs/api.md#api-scrollto)
+- [`scrollToElement(selector: string)`](docs/api.md#api-scrolltoelement)
+- [`setHtml(html: string)`](docs/api.md#api-sethtml)
+- [`setViewport(options: DeviceMetrics)`](docs/api.md#api-setviewport)
+- [`evaluate<U extends any>(fn: (...args: any[]) => void, ...args: any[])`](docs/api.md#api-evaluate)
+- [`inputValue(selector: string)`](docs/api.md#api-inputvalue)
+- [`exists(selector: string)`](docs/api.md#api-exists)
+- [`screenshot()`](docs/api.md#api-screenshot)
+- [`pdf(options?: PdfOptions)`](docs/api.md#api-pdf)
+- [`html()`](docs/api.md#api-html)
+- [`cookies()`](docs/api.md#api-cookies)
+- [`cookies(name: string)`](docs/api.md#api-cookies-name)
+- [`cookies(query: CookieQuery)`](docs/api.md#api-cookies-query) - Not implemented yet
+- [`allCookies()`](docs/api.md#api-all-cookies)
+- [`setCookies(name: string, value: string)`](docs/api.md#api-setcookies)
+- [`setCookies(cookie: Cookie)`](docs/api.md#api-setcookies-one)
+- [`setCookies(cookies: Cookie[])`](docs/api.md#api-setcookies-many)
+- [`deleteCookies(name: string)`](docs/api.md#api-deletecookies)
+- [`clearCookies()`](docs/api.md#api-clearcookies)
+- [`clearInput(selector: string)`](docs/api.md#api-clearInput)
+- [`setFileInput(selector: string, files: string | string[])`](docs/api.md#api-set-file-input)
+
+## Configuring Development Environment
+
+**Requirements:**
+- NodeJS version 8.2 and greater
+
+1) Clone this repository
+2) Run `npm install`
+3) To build: `npm run build`
+
+#### Linking this NPM repository
+
+1) Go to this repository locally
+2) Run `npm link`
+3) Go to the folder housing your chromeless scripts
+4) Run `npm link chromeless`
+
+Now your local chromeless scripts will use your local development of chromeless.
+
+## FAQ
+
+### How is this different from [NightmareJS](https://github.com/segmentio/nightmare), PhantomJS or Selenium?
+
+The `Chromeless` API is very similar to NightmareJS as their API is pretty awesome. The big difference is that `Chromeless` is based on Chrome in [headless-mode](https://developers.google.com/web/updates/2017/04/headless-chrome), and runs in a serverless function in AWS Lambda. The advantage of this is that you can run hundreds of browsers in parallel, without having to think about parallelisation. Running integration Tests for example is much faster.
+
+### I'm new to AWS Lambda, is this still for me?
+
+You still can use this locally without Lambda, so yes. Besides that, here is a [simple guide](https://github.com/graphcool/chromeless/tree/master/serverless) on how to set the lambda function up for `Chromeless`.
+
+### How much does it cost to run Chromeless in production?
+
+> The compute price is $0.00001667 per GB-s and the free tier provides 400,000 GB-s. The request price is $0.20 per 1 million requests and the free tier provides 1M requests per month.
+
+This means you can easily execute > 100.000 tests for free in the free tier.
+
+### Are there any limitations?
+
+If you're running Chromeless on AWS Lambda, the execution cannot take longer than 5 minutes which is the current limit of Lambda. Besides that, every feature that's supported in Chrome is also working with Chromeless. The maximal number of concurrent function executions is 1000. [AWS API Limits](http://docs.aws.amazon.com/lambda/latest/dg/limits.html)
 
 ## Troubleshooting
-
-Check the [Troubleshooting Guide](docs/troubleshooting.md) or [Debugging Koa](docs/guide.md#debugging-koa) in
-the general Koa guide.
-
-## Running tests
-
+### Error: Unable to get presigned websocket URL and connect to it.
+In case you get an error like this when running the Chromeless client:
 ```
-$ make test
+{ HTTPError: Response code 403 (Forbidden)
+    at stream.catch.then.data (/code/chromeless/node_modules/got/index.js:182:13)
+    at process._tickDomainCallback (internal/process/next_tick.js:129:7)
+  name: 'HTTPError',
+...
+Error: Unable to get presigned websocket URL and connect to it.
 ```
+Make sure that you're running at least version `1.19.0` of [`serverless`](https://github.com/serverless/serverless). It is a known [issue](https://github.com/serverless/serverless/issues/2450), that the API Gateway API keys are not setup correctly in older Serverless versions. Best is to run `npm run deploy` within the project as this will use the local installed version of `serverless`.
 
-## Authors
+### Resource ServerlessDeploymentBucket does not exist for stack chromeless-serverless-dev
+In case the deployment of the serverless function returns an error like this:
+```
+  Serverless Error ---------------------------------------
 
-See [AUTHORS](AUTHORS).
+  Resource ServerlessDeploymentBucket does not exist for stack chromeless-serverless-dev
+```
+Please check, that there is no stack with the name `chromeless-serverless-dev` existing yet, otherwise serverless can't correctly provision the bucket.
 
-## Community
+### No command gets executed
+In order for the commands to be processed, make sure, that you call one of the commands `screenshot`, `evaluate`, `cookiesGetAll` or `end` at the end of your execution chain.
 
- - [Badgeboard](https://koajs.github.io/badgeboard) and list of official modules
- - [Examples](https://github.com/koajs/examples)
- - [Middleware](https://github.com/koajs/koa/wiki) list
- - [Wiki](https://github.com/koajs/koa/wiki)
- - [G+ Community](https://plus.google.com/communities/101845768320796750641)
- - [Reddit Community](https://www.reddit.com/r/koajs)
- - [Mailing list](https://groups.google.com/forum/#!forum/koajs)
- - [中文文档](https://github.com/guo-yu/koa-guide)
- - __[#koajs]__ on freenode
+## Contributors
 
-## Job Board
+A big thank you to all contributors and supporters of this repository 💚
 
-Looking for a career upgrade?
-
-<a href="https://astro.netlify.com/automattic"><img src="https://astro.netlify.com/static/automattic.png"></a>
-<a href="https://astro.netlify.com/segment"><img src="https://astro.netlify.com/static/segment.png"></a>
-<a href="https://astro.netlify.com/auth0"><img src="https://astro.netlify.com/static/auth0.png"/></a>
-
-## Backers
-
-Support us with a monthly donation and help us continue our activities.
-
-<a href="https://opencollective.com/koajs/backer/0/website" target="_blank"><img src="https://opencollective.com/koajs/backer/0/avatar.svg"></a>
-<a href="https://opencollective.com/koajs/backer/1/website" target="_blank"><img src="https://opencollective.com/koajs/backer/1/avatar.svg"></a>
-<a href="https://opencollective.com/koajs/backer/2/website" target="_blank"><img src="https://opencollective.com/koajs/backer/2/avatar.svg"></a>
-<a href="https://opencollective.com/koajs/backer/3/website" target="_blank"><img src="https://opencollective.com/koajs/backer/3/avatar.svg"></a>
-<a href="https://opencollective.com/koajs/backer/4/website" target="_blank"><img src="https://opencollective.com/koajs/backer/4/avatar.svg"></a>
-<a href="https://opencollective.com/koajs/backer/5/website" target="_blank"><img src="https://opencollective.com/koajs/backer/5/avatar.svg"></a>
-<a href="https://opencollective.com/koajs/backer/6/website" target="_blank"><img src="https://opencollective.com/koajs/backer/6/avatar.svg"></a>
-<a href="https://opencollective.com/koajs/backer/7/website" target="_blank"><img src="https://opencollective.com/koajs/backer/7/avatar.svg"></a>
-<a href="https://opencollective.com/koajs/backer/8/website" target="_blank"><img src="https://opencollective.com/koajs/backer/8/avatar.svg"></a>
-<a href="https://opencollective.com/koajs/backer/9/website" target="_blank"><img src="https://opencollective.com/koajs/backer/9/avatar.svg"></a>
-<a href="https://opencollective.com/koajs/backer/10/website" target="_blank"><img src="https://opencollective.com/koajs/backer/10/avatar.svg"></a>
-<a href="https://opencollective.com/koajs/backer/11/website" target="_blank"><img src="https://opencollective.com/koajs/backer/11/avatar.svg"></a>
-<a href="https://opencollective.com/koajs/backer/12/website" target="_blank"><img src="https://opencollective.com/koajs/backer/12/avatar.svg"></a>
-<a href="https://opencollective.com/koajs/backer/13/website" target="_blank"><img src="https://opencollective.com/koajs/backer/13/avatar.svg"></a>
-<a href="https://opencollective.com/koajs/backer/14/website" target="_blank"><img src="https://opencollective.com/koajs/backer/14/avatar.svg"></a>
-<a href="https://opencollective.com/koajs/backer/15/website" target="_blank"><img src="https://opencollective.com/koajs/backer/15/avatar.svg"></a>
-<a href="https://opencollective.com/koajs/backer/16/website" target="_blank"><img src="https://opencollective.com/koajs/backer/16/avatar.svg"></a>
-<a href="https://opencollective.com/koajs/backer/17/website" target="_blank"><img src="https://opencollective.com/koajs/backer/17/avatar.svg"></a>
-<a href="https://opencollective.com/koajs/backer/18/website" target="_blank"><img src="https://opencollective.com/koajs/backer/18/avatar.svg"></a>
-<a href="https://opencollective.com/koajs/backer/19/website" target="_blank"><img src="https://opencollective.com/koajs/backer/19/avatar.svg"></a>
-<a href="https://opencollective.com/koajs/backer/20/website" target="_blank"><img src="https://opencollective.com/koajs/backer/20/avatar.svg"></a>
-<a href="https://opencollective.com/koajs/backer/21/website" target="_blank"><img src="https://opencollective.com/koajs/backer/21/avatar.svg"></a>
-<a href="https://opencollective.com/koajs/backer/22/website" target="_blank"><img src="https://opencollective.com/koajs/backer/22/avatar.svg"></a>
-<a href="https://opencollective.com/koajs/backer/23/website" target="_blank"><img src="https://opencollective.com/koajs/backer/23/avatar.svg"></a>
-<a href="https://opencollective.com/koajs/backer/24/website" target="_blank"><img src="https://opencollective.com/koajs/backer/24/avatar.svg"></a>
-<a href="https://opencollective.com/koajs/backer/25/website" target="_blank"><img src="https://opencollective.com/koajs/backer/25/avatar.svg"></a>
-<a href="https://opencollective.com/koajs/backer/26/website" target="_blank"><img src="https://opencollective.com/koajs/backer/26/avatar.svg"></a>
-<a href="https://opencollective.com/koajs/backer/27/website" target="_blank"><img src="https://opencollective.com/koajs/backer/27/avatar.svg"></a>
-<a href="https://opencollective.com/koajs/backer/28/website" target="_blank"><img src="https://opencollective.com/koajs/backer/28/avatar.svg"></a>
-<a href="https://opencollective.com/koajs/backer/29/website" target="_blank"><img src="https://opencollective.com/koajs/backer/29/avatar.svg"></a>
+<a href="https://github.com/joelgriffith/" target="_blank">
+  <img src="https://github.com/joelgriffith.png?size=64" width="64" height="64" alt="joelgriffith">
+</a>
+<a href="https://github.com/adieuadieu/" target="_blank">
+  <img src="https://github.com/adieuadieu.png?size=64" width="64" height="64" alt="adieuadieu">
+</a>
+<a href="https://github.com/schickling/" target="_blank">
+  <img src="https://github.com/schickling.png?size=64" width="64" height="64" alt="schickling">
+</a>
+<a href="https://github.com/timsuchanek/" target="_blank">
+  <img src="https://github.com/timsuchanek.png?size=64" width="64" height="64" alt="timsuchanek">
+</a>
 
 
-## Sponsors
+<a href="https://github.com/Chrisgozd/" target="_blank">
+  <img src="https://github.com/Chrisgozd.png?size=64" width="64" height="64" alt="Chrisgozd">
+</a>
+<a href="https://github.com/criticalbh/" target="_blank">
+  <img src="https://github.com/criticalbh.png?size=64" width="64" height="64" alt="criticalbh">
+</a>
+<a href="https://github.com/d2s/" target="_blank">
+  <img src="https://github.com/d2s.png?size=64" width="64" height="64" alt="d2s">
+</a>
+<a href="https://github.com/emeth-/" target="_blank">
+  <img src="https://github.com/emeth-.png?size=64" width="64" height="64" alt="emeth-">
+</a>
+<a href="https://github.com/githubixx/" target="_blank">
+  <img src="https://github.com/githubixx.png?size=64" width="64" height="64" alt="githubixx">
+</a>
+<a href="https://github.com/hax/" target="_blank">
+  <img src="https://github.com/hax.png?size=64" width="64" height="64" alt="hax">
+</a>
+<a href="https://github.com/Hazealign/" target="_blank">
+  <img src="https://github.com/Hazealign.png?size=64" width="64" height="64" alt="Hazealign">
+</a>
+<a href="https://github.com/joeyvandijk/" target="_blank">
+  <img src="https://github.com/joeyvandijk.png?size=64" width="64" height="64" alt="joeyvandijk">
+</a>
+<a href="https://github.com/liady/" target="_blank">
+  <img src="https://github.com/liady.png?size=64" width="64" height="64" alt="liady">
+</a>
+<a href="https://github.com/matthewmueller/" target="_blank">
+  <img src="https://github.com/matthewmueller.png?size=64" width="64" height="64" alt="matthewmueller">
+</a>
+<a href="https://github.com/seangransee/" target="_blank">
+  <img src="https://github.com/seangransee.png?size=64" width="64" height="64" alt="seangransee">
+</a>
+<a href="https://github.com/sorenbs/" target="_blank">
+  <img src="https://github.com/sorenbs.png?size=64" width="64" height="64" alt="sorenbs">
+</a>
+<a href="https://github.com/toddwprice/" target="_blank">
+  <img src="https://github.com/toddwprice.png?size=64" width="64" height="64" alt="toddwprice">
+</a>
+<a href="https://github.com/vladgolubev/" target="_blank">
+  <img src="https://github.com/vladgolubev.png?size=64" width="64" height="64" alt="vladgolubev">
+</a>
 
-Become a sponsor and get your logo on our README on Github with a link to your site.
 
-<a href="https://opencollective.com/koajs/sponsor/0/website" target="_blank"><img src="https://opencollective.com/koajs/sponsor/0/avatar.svg"></a>
-<a href="https://opencollective.com/koajs/sponsor/1/website" target="_blank"><img src="https://opencollective.com/koajs/sponsor/1/avatar.svg"></a>
-<a href="https://opencollective.com/koajs/sponsor/2/website" target="_blank"><img src="https://opencollective.com/koajs/sponsor/2/avatar.svg"></a>
-<a href="https://opencollective.com/koajs/sponsor/3/website" target="_blank"><img src="https://opencollective.com/koajs/sponsor/3/avatar.svg"></a>
-<a href="https://opencollective.com/koajs/sponsor/4/website" target="_blank"><img src="https://opencollective.com/koajs/sponsor/4/avatar.svg"></a>
-<a href="https://opencollective.com/koajs/sponsor/5/website" target="_blank"><img src="https://opencollective.com/koajs/sponsor/5/avatar.svg"></a>
-<a href="https://opencollective.com/koajs/sponsor/6/website" target="_blank"><img src="https://opencollective.com/koajs/sponsor/6/avatar.svg"></a>
-<a href="https://opencollective.com/koajs/sponsor/7/website" target="_blank"><img src="https://opencollective.com/koajs/sponsor/7/avatar.svg"></a>
-<a href="https://opencollective.com/koajs/sponsor/8/website" target="_blank"><img src="https://opencollective.com/koajs/sponsor/8/avatar.svg"></a>
-<a href="https://opencollective.com/koajs/sponsor/9/website" target="_blank"><img src="https://opencollective.com/koajs/sponsor/9/avatar.svg"></a>
-<a href="https://opencollective.com/koajs/sponsor/10/website" target="_blank"><img src="https://opencollective.com/koajs/sponsor/10/avatar.svg"></a>
-<a href="https://opencollective.com/koajs/sponsor/11/website" target="_blank"><img src="https://opencollective.com/koajs/sponsor/11/avatar.svg"></a>
-<a href="https://opencollective.com/koajs/sponsor/12/website" target="_blank"><img src="https://opencollective.com/koajs/sponsor/12/avatar.svg"></a>
-<a href="https://opencollective.com/koajs/sponsor/13/website" target="_blank"><img src="https://opencollective.com/koajs/sponsor/13/avatar.svg"></a>
-<a href="https://opencollective.com/koajs/sponsor/14/website" target="_blank"><img src="https://opencollective.com/koajs/sponsor/14/avatar.svg"></a>
-<a href="https://opencollective.com/koajs/sponsor/15/website" target="_blank"><img src="https://opencollective.com/koajs/sponsor/15/avatar.svg"></a>
-<a href="https://opencollective.com/koajs/sponsor/16/website" target="_blank"><img src="https://opencollective.com/koajs/sponsor/16/avatar.svg"></a>
-<a href="https://opencollective.com/koajs/sponsor/17/website" target="_blank"><img src="https://opencollective.com/koajs/sponsor/17/avatar.svg"></a>
-<a href="https://opencollective.com/koajs/sponsor/18/website" target="_blank"><img src="https://opencollective.com/koajs/sponsor/18/avatar.svg"></a>
-<a href="https://opencollective.com/koajs/sponsor/19/website" target="_blank"><img src="https://opencollective.com/koajs/sponsor/19/avatar.svg"></a>
-<a href="https://opencollective.com/koajs/sponsor/20/website" target="_blank"><img src="https://opencollective.com/koajs/sponsor/20/avatar.svg"></a>
-<a href="https://opencollective.com/koajs/sponsor/21/website" target="_blank"><img src="https://opencollective.com/koajs/sponsor/21/avatar.svg"></a>
-<a href="https://opencollective.com/koajs/sponsor/22/website" target="_blank"><img src="https://opencollective.com/koajs/sponsor/22/avatar.svg"></a>
-<a href="https://opencollective.com/koajs/sponsor/23/website" target="_blank"><img src="https://opencollective.com/koajs/sponsor/23/avatar.svg"></a>
-<a href="https://opencollective.com/koajs/sponsor/24/website" target="_blank"><img src="https://opencollective.com/koajs/sponsor/24/avatar.svg"></a>
-<a href="https://opencollective.com/koajs/sponsor/25/website" target="_blank"><img src="https://opencollective.com/koajs/sponsor/25/avatar.svg"></a>
-<a href="https://opencollective.com/koajs/sponsor/26/website" target="_blank"><img src="https://opencollective.com/koajs/sponsor/26/avatar.svg"></a>
-<a href="https://opencollective.com/koajs/sponsor/27/website" target="_blank"><img src="https://opencollective.com/koajs/sponsor/27/avatar.svg"></a>
-<a href="https://opencollective.com/koajs/sponsor/28/website" target="_blank"><img src="https://opencollective.com/koajs/sponsor/28/avatar.svg"></a>
-<a href="https://opencollective.com/koajs/sponsor/29/website" target="_blank"><img src="https://opencollective.com/koajs/sponsor/29/avatar.svg"></a>
 
-# License
 
-  MIT
+## Credits
 
-[npm-image]: https://img.shields.io/npm/v/koa.svg?style=flat-square
-[npm-url]: https://www.npmjs.com/package/koa
-[travis-image]: https://img.shields.io/travis/koajs/koa/master.svg?style=flat-square
-[travis-url]: https://travis-ci.org/koajs/koa
-[coveralls-image]: https://img.shields.io/codecov/c/github/koajs/koa.svg?style=flat-square
-[coveralls-url]: https://codecov.io/github/koajs/koa?branch=master
-[backers-image]: https://opencollective.com/koajs/backers/badge.svg?style=flat-square
-[sponsors-image]: https://opencollective.com/koajs/sponsors/badge.svg?style=flat-square
-[gitter-image]: https://img.shields.io/gitter/room/koajs/koa.svg?style=flat-square
-[gitter-url]: https://gitter.im/koajs/koa?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge
-[#koajs]: https://webchat.freenode.net/?channels=#koajs
+* [chrome-remote-interface](https://github.com/cyrus-and/chrome-remote-interface): Chromeless uses this package as an interface to Chrome
+* [serverless-chrome](https://github.com/adieuadieu/serverless-chrome): Compiled Chrome binary that runs on AWS Lambda (Azure and GCP soon, too.)
+* [NightmareJS](https://github.com/segmentio/nightmare): We draw a lot of inspiration for the API from this great tool
+
+
+<a name="help-and-community" />
+
+## Help & Community [![Slack Status](https://slack.graph.cool/badge.svg)](https://slack.graph.cool)
+
+Join our [Slack community](http://slack.graph.cool/) if you run into issues or have questions. We love talking to you!
+
+[![](http://i.imgur.com/5RHR6Ku.png)](https://www.graph.cool/)
