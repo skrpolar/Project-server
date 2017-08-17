@@ -241,17 +241,10 @@ In order for the commands to be processed, make sure, that you call one of the c
 
 A big thank you to all contributors and supporters of this repository 💚
 
-<a href="https://github.com/joelgriffith/" target="_blank">
-  <img src="https://github.com/joelgriffith.png?size=64" width="64" height="64" alt="joelgriffith">
-</a>
-<a href="https://github.com/adieuadieu/" target="_blank">
-  <img src="https://github.com/adieuadieu.png?size=64" width="64" height="64" alt="adieuadieu">
-</a>
-<a href="https://github.com/schickling/" target="_blank">
-  <img src="https://github.com/schickling.png?size=64" width="64" height="64" alt="schickling">
-</a>
-<a href="https://github.com/timsuchanek/" target="_blank">
-  <img src="https://github.com/timsuchanek.png?size=64" width="64" height="64" alt="timsuchanek">
+<a href="https://github.com/joelgriffith/" target="_blank"><img src="https://github.com/joelgriffith.png?size=64" width="64" height="64" alt="joelgriffith">
+</a><a href="https://github.com/adieuadieu/" target="_blank"><img src="https://github.com/adieuadieu.png?size=64" width="64" height="64" alt="adieuadieu"> </a>
+<a href="https://github.com/schickling/" target="_blank"><img src="https://github.com/schickling.png?size=64" width="64" height="64" alt="schickling">
+</a><a href="https://github.com/timsuchanek/" target="_blank"><img src="https://github.com/timsuchanek.png?size=64" width="64" height="64" alt="timsuchanek">
 </a>
 
 

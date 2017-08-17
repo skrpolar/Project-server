@@ -8,26 +8,25 @@ var marked = require('marked');
 app.use('/', express.static(__dirname + '/vuewebpack'));
 
 router.get('/getnavbar', function (req, res) {
-    var s = JSON.parse(fs.readFileSync('./www/navInit.json', 'utf8'));
-    res.jsonp(s);
+    fs.readFile('./www/navInit.json', 'utf8', function (err, data) {
+        if (req.query.type == 'router') {
+            console.log('r');
+            res.send(`change(${data})`);
+        } else {
+            res.jsonp(JSON.parse(data));
+        }
+
+    });
 });
 
 router.get('/getmarkdown', function (req, res) {
-    var b = ((fs.readFileSync(`./md/${req.query.name}.md`, 'utf8')).toString());
-    res.jsonp({a: b});
+    fs.readFile(`./md/${req.query.name}.md`, 'utf8', function (err, data) {
+        res.jsonp({
+            a: data
+        });
+    });
 });
 
 app.use(router);
 
 server.listen(8089);
-
-// marked.setOptions({
-//     renderer: new marked.Renderer(),
-//     gfm: true,
-//     tables: true,
-//     breaks: false,
-//     pedantic: false,
-//     sanitize: false,
-//     smartLists: true,
-//     smartypants: false
-// });

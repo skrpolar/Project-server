@@ -136,5 +136,14 @@
         "hasNext": false,
         "path": "/menu6",
         "liActive": 6
+    },
+    "menu7": {
+        "text": {
+            "ch": "标题七",
+            "en": "Menu7"
+        },
+        "hasNext": false,
+        "path": "/menu7",
+        "liActive": 7
     }
 }
