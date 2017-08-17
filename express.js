@@ -10,7 +10,6 @@ app.use('/', express.static(__dirname + '/vuewebpack'));
 router.get('/getnavbar', function (req, res) {
     fs.readFile('./www/navInit.json', 'utf8', function (err, data) {
         if (req.query.type == 'router') {
-            console.log('r');
             res.send(`change(${data})`);
         } else {
             res.jsonp(JSON.parse(data));
@@ -20,7 +19,7 @@ router.get('/getnavbar', function (req, res) {
 });
 
 router.get('/getmarkdown', function (req, res) {
-    fs.readFile(`./md/${req.query.name}.md`, 'utf8', function (err, data) {
+    fs.readFile(`./md/${req.query.name}_${req.query.locale}.md`, 'utf8', function (err, data) {
         res.jsonp({
             a: data
         });
