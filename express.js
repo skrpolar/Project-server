@@ -20,23 +20,19 @@ router.get('/getnavbar', function (req, res) {
 });
 
 router.get('/getmarkdown', function (req, res) {
-
-    searchDir('./md', `${req.query.name}_${req.query.locale}.md`)
-        .then(r => {
-            fs.readFile(r, 'utf8', function (err, data) {
+    core('./md', `${req.query.name}_${req.query.locale}.md`)
+        .then(path => {
+            fs.readFile(path, 'utf8', function (err, data) {
                 res.jsonp({
                     a: data
                 });
             });
         })
-
 });
 
 app.use(router);
 
 server.listen(8089);
-
-
 
 function searchDir(path, fileName) {
     return new Promise(function (resolve, reject) {
@@ -60,4 +56,13 @@ function searchDir(path, fileName) {
 
         ser(path, fileName);
     });
+}
+
+async function core(path, fileName) {
+    try {
+        const result = await searchDir(path, fileName);
+        return result
+    } catch (error) {
+        console.log(`core_error: ${error}`);
+    }
 }
