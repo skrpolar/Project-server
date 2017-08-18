@@ -20,18 +20,15 @@ router.get('/getnavbar', function (req, res) {
 });
 
 router.get('/getmarkdown', function (req, res) {
-    // fs.readFile(`./md/x/${req.query.name}_${req.query.locale}.md`, 'utf8', function (err, data) {
-    //     res.jsonp({
-    //         a: data
-    //     });
-    // });
 
-
-    var b = searchDir('./md', `${req.query.name}_${req.query.locale}.md`)
-    .then(function (p){
-        console.log(p);
-    })
-    
+    searchDir('./md', `${req.query.name}_${req.query.locale}.md`)
+        .then(r => {
+            fs.readFile(r, 'utf8', function (err, data) {
+                res.jsonp({
+                    a: data
+                });
+            });
+        })
 
 });
 
@@ -43,20 +40,24 @@ server.listen(8089);
 
 function searchDir(path, fileName) {
     return new Promise(function (resolve, reject) {
-        fs.readdir(path, function (err, files) {
-            for (var i in files) {
-                (function (i) {
-                    fs.stat(`${path}/${files[i]}`, function (err, stats) {
-                        if (stats.isDirectory()) {
-                            
-                        } else {
-                            if (files[i] == fileName) {
-                                resolve(files[i]);
-                            } 
-                        }
-                    });
-                })(i);
-            }
-        });
+        function ser(path, fileName) {
+            fs.readdir(path, function (err, files) {
+                for (var i in files) {
+                    (function (i) {
+                        fs.stat(`${path}/${files[i]}`, function (err, stats) {
+                            if (stats.isDirectory()) {
+                                ser(`${path}/${files[i]}`, fileName)
+                            } else {
+                                if (files[i] == fileName) {
+                                    resolve(`${path}/${files[i]}`);
+                                }
+                            }
+                        });
+                    })(i);
+                }
+            });
+        }
+
+        ser(path, fileName);
     });
 }
