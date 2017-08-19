@@ -30,6 +30,10 @@ router.get('/getmarkdown', function (req, res) {
         })
 });
 
+router.get('/search', function (req, res) {
+    
+});
+
 app.use(router);
 
 server.listen(8089);
@@ -61,7 +65,7 @@ function searchDir(path, fileName) {
 async function core(path, fileName) {
     try {
         const result = await searchDir(path, fileName);
-        return result
+        return result;
     } catch (error) {
         console.log(`core_error: ${error}`);
     }
