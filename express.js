@@ -20,7 +20,7 @@ router.get('/getnavbar', function (req, res) {
 });
 
 router.get('/getmarkdown', function (req, res) {
-    core('./md', `${req.query.name}_${req.query.locale}.md`)
+    coreDir('./md', `${req.query.name}_${req.query.locale}.md`)
         .then(path => {
             fs.readFile(path, 'utf8', function (err, data) {
                 res.jsonp({
@@ -31,7 +31,11 @@ router.get('/getmarkdown', function (req, res) {
 });
 
 router.get('/search', function (req, res) {
-    
+    var obj = getFileList('./md', req.query.lang);
+    coreContent(obj, req.query.s)
+        .then(arr => {
+            res.jsonp(arr);
+        });
 });
 
 app.use(router);
@@ -62,11 +66,76 @@ function searchDir(path, fileName) {
     });
 }
 
-async function core(path, fileName) {
+function getFileList(path, lang) {
+    var filesList = [];
+    readFile(path, filesList, lang);
+    return filesList;
+}
+
+function readFile(path, filesList, lang) {
+    files = fs.readdirSync(path);
+    files.forEach(walk);
+
+    function walk(file) {
+        states = fs.statSync(`${path}/${file}`);
+        if (states.isDirectory()) {
+            readFile(`${path}/${file}`, filesList, lang);
+        } else {
+            if (file.indexOf(`_${lang}`) !== -1) {
+                var obj = {};
+                obj.name = file;
+                obj.path = `${path}/${file}`;
+                filesList.push(obj);
+            }
+        }
+    }
+}
+
+function searchContent(obj, content) {
+    return new Promise(function (resolve, reject) {
+        function ser(obj, content) {
+            for (var i in obj) {
+                (function (i) {
+                    fs.readFile(obj[i].path, function (err, data) {
+                        var re = /<[^>]+>/gi;
+                        var str = marked(data.toString()).replace(re, '');
+                        if(str.indexOf(content) !== -1) {
+                            var n = str.substr(str.indexOf(content),str.indexOf(content) + 100);
+                            n = n.replace(/[\n]/gi, '');
+                            c.push({
+                                name: obj[i].name,
+                                content: n
+                            });
+                        }
+                        num ++;
+                        if(num == 9) {
+                            resolve(c);
+                        }
+                    });
+                })(i);
+            }
+        }
+
+        var num = 0;
+        var c = [];
+        ser(obj, content);
+    });
+}
+
+async function coreDir(path, fileName) {
     try {
         const result = await searchDir(path, fileName);
         return result;
     } catch (error) {
-        console.log(`core_error: ${error}`);
+        console.log(`core_dir_error: ${error}`);
+    }
+}
+
+async function coreContent(obj, content) {
+    try {
+        const result = await searchContent(obj, content);
+        return result;
+    } catch (error) {
+        console.log(`core_dir_error: ${error}`);
     }
 }

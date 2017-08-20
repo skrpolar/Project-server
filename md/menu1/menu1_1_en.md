@@ -4,18 +4,12 @@
 
 Available Translations: [Korean](https://github.com/electron/electron/tree/master/docs-translations/ko-KR/project/README.md) | [Simplified Chinese](https://github.com/electron/electron/tree/master/docs-translations/zh-CN/project/README.md) | [Brazilian Portuguese](https://github.com/electron/electron/tree/master/docs-translations/pt-BR/project/README.md) | [Traditional Chinese](https://github.com/electron/electron/tree/master/docs-translations/zh-TW/project/README.md) | [Spanish](https://github.com/electron/electron/tree/master/docs-translations/es/project/README.md) | [Turkish](https://github.com/electron/electron/tree/master/docs-translations/tr-TR/project/README.md) | [German](https://github.com/electron/electron/tree/master/docs-translations/de-DE/project/README.md)
 
-The Electron framework lets you write cross-platform desktop applications
-using JavaScript, HTML and CSS. It is based on [Node.js](https://nodejs.org/) and
-[Chromium](http://www.chromium.org) and is used by the [Atom
-editor](https://github.com/atom/atom) and many other [apps](https://electron.atom.io/apps).
+The Electron framework lets you write cross-platform desktop applications using JavaScript, HTML and CSS. It is based on [Node.js](https://nodejs.org/) and [Chromium](http://www.chromium.org) and is used by the [Atom editor](https://github.com/atom/atom) and many other [apps](https://electron.atom.io/apps).
 
-Follow [@ElectronJS](https://twitter.com/electronjs) on Twitter for important
-announcements.
+Follow [@ElectronJS](https://twitter.com/electronjs) on Twitter for important announcements.
 
-This project adheres to the Contributor Covenant 
-[code of conduct](https://github.com/electron/electron/tree/master/CODE_OF_CONDUCT.md).
-By participating, you are expected to uphold this code. Please report unacceptable
-behavior to [electron@github.com](mailto:electron@github.com).
+This project adheres to the Contributor Covenant [code of conduct](https://github.com/electron/electron/tree/master/CODE_OF_CONDUCT.md).
+By participating, you are expected to uphold this code. Please report unacceptable behavior to [electron@github.com](mailto:electron@github.com).
 
 ## Installation
 
