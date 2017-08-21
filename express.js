@@ -99,8 +99,11 @@ function searchContent(obj, content) {
                     fs.readFile(obj[i].path, function (err, data) {
                         var re = /<[^>]+>/gi;
                         var str = marked(data.toString()).replace(re, '');
-                        if(str.indexOf(content) !== -1) {
-                            var n = str.substr(str.indexOf(content),str.indexOf(content) + 100);
+                        var re2 = new RegExp(`.*${content}.*`,"gi");
+                        console.log();
+                        if(str.search(re2) !== -1) {
+                            var index = str.search(re2);
+                            var n = str.substr(index, index + 100);
                             n = n.replace(/[\n]/gi, '');
                             c.push({
                                 name: obj[i].name,
@@ -108,7 +111,7 @@ function searchContent(obj, content) {
                             });
                         }
                         num ++;
-                        if(num == 9) {
+                        if(num == obj.length) {
                             resolve(c);
                         }
                     });
