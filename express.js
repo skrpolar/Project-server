@@ -32,7 +32,7 @@ router.get('/getmarkdown', function (req, res) {
 
 router.get('/search', function (req, res) {
     var obj = getFileList('./md', req.query.lang);
-    coreContent(obj, req.query.s, req.query.lang)
+    coreContent(obj, req.query.s)
         .then(arr => {
             res.jsonp(arr);
         });
@@ -92,9 +92,9 @@ function readFile(path, filesList, lang) {
     }
 }
 
-function searchContent(obj, content, nav, lang) {
+function searchContent(obj, content) {
     return new Promise(function (resolve, reject) {
-        function ser(obj, content, nav, lang) {
+        function ser(obj, content) {
             for (var i in obj) {
                 (function (i) {
                     fs.readFile(obj[i].path, function (err, data) {
@@ -106,12 +106,10 @@ function searchContent(obj, content, nav, lang) {
                             var n = str.substr(index, 300);
                             // var n = str;
                             n = n.replace(/[\n]/gi, '');
-                            var name = iterator(nav, obj[i].name, lang);
-                            console.log(nav);
-                                c.push({
-                                    name: name,
-                                    content: n
-                                });
+                            c.push({
+                                name: obj[i].name,
+                                content: n
+                            });
                         }
                         num++;
                         if (num == obj.length) {
@@ -124,33 +122,8 @@ function searchContent(obj, content, nav, lang) {
 
         var num = 0;
         var c = [];
-        ser(obj, content, nav, lang);
+        ser(obj, content);
     });
-}
-
-function getNavInit() {
-    return new Promise(function (resolve, reject) {
-        fs.readFile('./www/navInit.json', 'utf8', function (err, data) {
-            resolve(data);
-        });
-    });
-}
-
-function iterator(obj, str, lang) {
-    for (var i in obj) {
-        console.log(i);
-        if (obj[i].hasOwnProperty('navActive')) {
-            
-            if (obj[i] == str) {
-                
-                return obj[i].text[lang];
-            } else {
-                this.iterator(obj[i].next, str, lang);
-            }
-        } else if (i == str) {
-            return obj[i].text[lang];
-        }
-    }
 }
 
 async function coreDir(path, fileName) {
@@ -162,10 +135,9 @@ async function coreDir(path, fileName) {
     }
 }
 
-async function coreContent(obj, content, lang) {
+async function coreContent(obj, content) {
     try {
-        const nav = await getNavInit();
-        const result = await searchContent(obj, content, nav, lang);
+        const result = await searchContent(obj, content);
         return result;
     } catch (error) {
         console.log(`core_dir_error: ${error}`);
