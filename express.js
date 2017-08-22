@@ -83,10 +83,10 @@ function readFile(path, filesList, lang) {
         } else {
             var index = file.indexOf(`_${lang}`);
             if (index !== -1) {
-                var obj = {};
-                obj.name = file.substring(0, index);
-                obj.path = `${path}/${file}`;
-                filesList.push(obj);
+                filesList.push({
+                    name: file.substring(0, index),
+                    path: `${path}/${file}`
+                });
             }
         }
     }
