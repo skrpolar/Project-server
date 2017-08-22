@@ -100,15 +100,16 @@ function searchContent(obj, content) {
                     fs.readFile(obj[i].path, function (err, data) {
                         var re = /<[^>]+>/gi;
                         var str = marked(data.toString()).replace(re, '');
-                        var re2 = new RegExp(`.*${content}.*`, "gi");
+                        var re2 = new RegExp(`.*${content}.*`, 'gi');
+                        var re3 = new RegExp(`${content}`, 'gi');
                         if (str.search(re2) !== -1) {
                             var index = str.search(re2);
                             var n = str.substr(index, 300);
-                            // var n = str;
-                            n = n.replace(/[\n]/gi, '');
+                            var x = n.replace(re3, '<em>$&</em>');
+                            x = x.replace(/[\n]/gi, '');
                             c.push({
                                 name: obj[i].name,
-                                content: n
+                                content: x
                             });
                         }
                         num++;
