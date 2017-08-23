@@ -32,7 +32,8 @@ router.get('/getmarkdown', function (req, res) {
 
 router.get('/search', function (req, res) {
     var obj = getFileList('./md', req.query.lang);
-    coreContent(obj, req.query.s, req.query.lang)
+    var nav = JSON.parse(fs.readFileSync('./www/navInit.json', 'utf8'));
+    coreContent(obj, req.query.s, req.query.lang, nav)
         .then(arr => {
             res.jsonp(arr);
         });
@@ -103,16 +104,30 @@ function searchContent(obj, content, nav, lang) {
                         var str = marked(data.toString()).replace(re, '');
                         var re2 = new RegExp(`.*${content}.*`, 'gi');
                         var re3 = new RegExp(`${content}`, 'gi');
-                        var t = searchNavInit(nav, content, lang);
                         if (str.search(re2) !== -1) {
-                            var index = str.search(re2);
-                            var n = str.substr(index, 300);
-                            var x = n.replace(re3, '<em>$&</em>');
-                            x = x.replace(/[\n]/gi, '');
-                            c.push({
-                                name: obj[i].name,
-                                content: x
-                            });
+                            coreTitle(nav, content, lang, obj[i].name, true, re3)
+                                .then(t => {
+                                    var index = str.search(re2);
+                                    var n = str.substr(index, 300);
+                                    var x = n.replace(re3, '<em>$&</em>');
+                                    x = x.replace(/[\n]/gi, '');
+                                    c.push({
+                                        name: t,
+                                        router: obj[i].name,
+                                        content: x
+                                    });
+                                });
+                        } else {
+                            coreTitle(nav, content, lang, obj[i].name, false, re3)
+                                .then(t => {
+                                    if (t !== undefined) {
+                                        c.push({
+                                            name: t,
+                                            router: obj[i].name,
+                                            content: str
+                                        });
+                                    }
+                                });
                         }
                         num++;
                         if (num == obj.length) {
@@ -129,24 +144,60 @@ function searchContent(obj, content, nav, lang) {
     });
 }
 
-function searchNavInit(obj, content, lang) {
-    var re = new RegExp(`[${content}]`, 'gi');
-    for (var i in obj) {
-        if (obj[i].hasOwnProperty('navActive')) {
+function searchNav(obj, content, lang, name, j, re3) {
+    return new Promise(function (resolve, reject) {
+        function searchNavInit(obj, content, lang, name, j, re3) {
+            for (var i in obj) {
+                if (i == name) {
+                    if (j) {
+                        // console.log(name);
+                        if (obj[i].text[lang].search(re3) !== -1) {
+                            resolve(obj[i].text[lang].replace(re3, '<em>$&</em>'));
+                        } else resolve(obj[i].text[lang]);
+                    } else {
+                        if (obj[i].text[lang].search(re3) !== -1) {
+                            resolve(obj[i].text[lang].replace(re3, '<em>$&</em>'));
+                        }
+                    }
+                } else if (obj[i].hasOwnProperty('navActive')) {
+                    searchNavInit(obj[i].next, content, lang, name, j, re3);
+                }
+            }
+        }
+
+        searchNavInit(obj, content, lang, name, j, re3);
+    });
+}
+
+/*
+
+if (obj[i].hasOwnProperty('navActive')) {
             if (obj[i].text[lang].search(re) !== -1) {
-                // console.log(obj[i].text[lang].replace(re, '<em>$&</em>'));
-                return obj[i].text[lang].replace(re, '<em>$&</em>');
+                if (i == name) {
+                    return obj[i].text[lang].replace(re, '<em>$&</em>');
+                } else {
+                    return (i => searchNavInit(obj[i].next, content, lang, name))(i);
+                }
             } else {
-                return searchNavInit(obj[i].next, content, lang);
+                if (i == name) {
+                    return obj[i].text[lang];
+                } else {
+                    return (i => searchNavInit(obj[i].next, content, lang, name))(i);
+                }
             }
         } else {
             if (obj[i].text[lang].search(re) !== -1) {
-                // console.log(obj[i].text[lang].replace(re, '<em>$&</em>'));
-                return obj[i].text[lang].replace(re, '<em>$&</em>');
+                if (i == name) {
+                    return obj[i].text[lang].replace(re, '<em>$&</em>');
+                }
+            } else {
+                if (i == name) {
+                    return obj[i].text[lang];
+                }
             }
         }
-    }
-}
+
+*/
 
 async function coreDir(path, fileName) {
     try {
@@ -157,12 +208,20 @@ async function coreDir(path, fileName) {
     }
 }
 
-async function coreContent(obj, content, lang) {
+async function coreContent(obj, content, lang, nav) {
     try {
-        const nav = JSON.parse(fs.readFileSync('./www/navInit.json', 'utf8'));
         const result = await searchContent(obj, content, nav, lang);
         return result;
     } catch (error) {
         console.log(`core_dir_error: ${error}`);
+    }
+}
+
+async function coreTitle(obj, content, lang, name, j, re3) {
+    try {
+        const result = await searchNav(obj, content, lang, name, j, re3);
+        return result;
+    } catch (error) {
+        console.log(`core_title_error: ${error}`);
     }
 }
