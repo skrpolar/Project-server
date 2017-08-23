@@ -32,10 +32,11 @@ router.get('/getmarkdown', function (req, res) {
 
 router.get('/search', function (req, res) {
     var obj = getFileList('./md', req.query.lang);
-    coreContent(obj, req.query.s)
+    coreContent(obj, req.query.s, req.query.lang)
         .then(arr => {
             res.jsonp(arr);
         });
+
 });
 
 app.use(router);
@@ -92,9 +93,9 @@ function readFile(path, filesList, lang) {
     }
 }
 
-function searchContent(obj, content) {
+function searchContent(obj, content, nav, lang) {
     return new Promise(function (resolve, reject) {
-        function ser(obj, content) {
+        function ser(obj, content, nav, lang) {
             for (var i in obj) {
                 (function (i) {
                     fs.readFile(obj[i].path, function (err, data) {
@@ -102,6 +103,7 @@ function searchContent(obj, content) {
                         var str = marked(data.toString()).replace(re, '');
                         var re2 = new RegExp(`.*${content}.*`, 'gi');
                         var re3 = new RegExp(`${content}`, 'gi');
+                        var t = searchNavInit(nav, content, lang);
                         if (str.search(re2) !== -1) {
                             var index = str.search(re2);
                             var n = str.substr(index, 300);
@@ -123,8 +125,27 @@ function searchContent(obj, content) {
 
         var num = 0;
         var c = [];
-        ser(obj, content);
+        ser(obj, content, nav, lang);
     });
+}
+
+function searchNavInit(obj, content, lang) {
+    var re = new RegExp(`[${content}]`, 'gi');
+    for (var i in obj) {
+        if (obj[i].hasOwnProperty('navActive')) {
+            if (obj[i].text[lang].search(re) !== -1) {
+                // console.log(obj[i].text[lang].replace(re, '<em>$&</em>'));
+                return obj[i].text[lang].replace(re, '<em>$&</em>');
+            } else {
+                return searchNavInit(obj[i].next, content, lang);
+            }
+        } else {
+            if (obj[i].text[lang].search(re) !== -1) {
+                // console.log(obj[i].text[lang].replace(re, '<em>$&</em>'));
+                return obj[i].text[lang].replace(re, '<em>$&</em>');
+            }
+        }
+    }
 }
 
 async function coreDir(path, fileName) {
@@ -136,9 +157,10 @@ async function coreDir(path, fileName) {
     }
 }
 
-async function coreContent(obj, content) {
+async function coreContent(obj, content, lang) {
     try {
-        const result = await searchContent(obj, content);
+        const nav = JSON.parse(fs.readFileSync('./www/navInit.json', 'utf8'));
+        const result = await searchContent(obj, content, nav, lang);
         return result;
     } catch (error) {
         console.log(`core_dir_error: ${error}`);
