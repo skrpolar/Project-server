@@ -125,7 +125,6 @@ function searchContent(obj, content, nav, lang) {
                                         router: obj[i].name,
                                         content: str
                                     });
-                                    console.log(t);
                                 }).catch(e => {
                                     console.log(e);
                                 });
