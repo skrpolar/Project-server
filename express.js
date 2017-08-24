@@ -4,7 +4,10 @@ var express = require('express'),
     app = express(),
     server = require('http').createServer(app),
     router = express.Router(),
-    marked = require('marked');
+    marked = require('marked'),
+    history = require('connect-history-api-fallback');
+
+// app.use(history());
 
 app.use('/', express.static(__dirname + '/vuewebpack'));
 
