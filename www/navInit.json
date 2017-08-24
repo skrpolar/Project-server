@@ -15,7 +15,7 @@
                 },
                 "hasNext": false,
                 "path": "/",
-                "liActive": 11
+                "liActive": "1_1"
             },
             "menu1_2": {
                 "text": {
@@ -24,7 +24,7 @@
                 },
                 "hasNext": false,
                 "path": "/content2",
-                "liActive": 12
+                "liActive": "1_2"
             },
             "menu1_3": {
                 "text": {
@@ -41,7 +41,7 @@
                             "en": "Content"
                         },
                         "hasNext": false,
-                        "liActive": 131,
+                        "liActive": "1_3_1",
                         "path": "/content3"
                     }
                 }
@@ -64,7 +64,7 @@
                 },
                 "hasNext": false,
                 "path": "/content4",
-                "liActive": 21
+                "liActive": "2_1"
             }
         }
     },
@@ -84,7 +84,7 @@
                 },
                 "hasNext": false,
                 "path": "/content5",
-                "liActive": 31
+                "liActive": "3_1"
             }
         }
     },
@@ -104,7 +104,7 @@
                 },
                 "hasNext": false,
                 "path": "/content6",
-                "liActive": 41
+                "liActive": "4_1"
             }
         }
     },
@@ -124,7 +124,7 @@
                 },
                 "hasNext": false,
                 "path": "/content7",
-                "liActive": 51
+                "liActive": "5_1"
             }
         }
     },
@@ -135,7 +135,7 @@
         },
         "hasNext": false,
         "path": "/menu6",
-        "liActive": 6
+        "liActive": "6"
     },
     "menu7": {
         "text": {
@@ -144,6 +144,6 @@
         },
         "hasNext": false,
         "path": "/menu7",
-        "liActive": 7
+        "liActive": "7"
     }
 }
