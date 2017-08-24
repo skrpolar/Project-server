@@ -120,18 +120,21 @@ function searchContent(obj, content, nav, lang) {
                         } else {
                             coreTitle(nav, content, lang, obj[i].name, false, re3)
                                 .then(t => {
-                                    if (t !== undefined) {
-                                        c.push({
-                                            name: t,
-                                            router: obj[i].name,
-                                            content: str
-                                        });
-                                    }
+                                    c.push({
+                                        name: t,
+                                        router: obj[i].name,
+                                        content: str
+                                    });
+                                    console.log(t);
+                                }).catch(e => {
+                                    console.log(e);
                                 });
                         }
                         num++;
                         if (num == obj.length) {
-                            resolve(c);
+                            setTimeout(function() {
+                                resolve(c);
+                            }, 0);
                         }
                     });
                 })(i);
