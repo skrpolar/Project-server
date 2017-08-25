@@ -9,7 +9,7 @@ var express = require('express'),
 
 // app.use(history());
 
-app.use('/', express.static(__dirname + '/vuewebpack'));
+// app.use('/', express.static(__dirname + '/vuewebpack'));
 
 router.get('/getnavbar', function (req, res) {
     fs.readFile('./www/navInit.json', 'utf8', function (err, data) {

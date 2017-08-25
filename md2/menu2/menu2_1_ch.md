@@ -1,0 +1,9 @@
+# 开发过程
+
+使用vue-cli配置好项目工程之后，从公司官网copy了顶部导航栏和底部信息栏到components文件夹，在App.vue中的模板中导入并调用。
+
+在App.vue中增加左侧导航栏，导航菜单的信息的json文件在组件挂载时期过后从服务器用vue实例的JSONP获取。菜单的结构对应json文件的结构，在Template模板中用v-for遍历json实现导航栏的显示。
+
+菜单对应的内容由router-link路由导向至右侧内容栏的router-view显示。路由配置在router文件夹内的index.js，在主入口文件main.js中导入初始路由配置并通过加入script标签实现的JSONP再次从服务器获取菜单json文件，获取完成后会调用全局函数change使用addRoutes动态增加路由。每一个路由配置都导向content.vue组件。
+
+在App.vue中增加右侧内容栏，内容为content.vue组件。导航路由进content后，根据路由信息中的name和当前语言locale来从服务器获取对应name_locale的md文件。获取md文件后赋值给vue-i18n实例的messages中对应locale的对象，先获取当前locale的md文件，在获取另一个locale的md文件。在切换语言的时候就不会等待时间重新获取。
