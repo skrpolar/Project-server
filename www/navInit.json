@@ -6,7 +6,7 @@
         },
         "navActive": false,
         "hasNext": true,
-        "nextLength": 3,
+        "level": 1,
         "next": {
             "menu1_1": {
                 "text": {
@@ -15,7 +15,8 @@
                 },
                 "hasNext": false,
                 "path": "/",
-                "liActive": "1_1"
+                "liActive": "1_1",
+                "level": 2
             },
             "menu1_2": {
                 "text": {
@@ -24,7 +25,8 @@
                 },
                 "hasNext": false,
                 "path": "/content2",
-                "liActive": "1_2"
+                "liActive": "1_2",
+                "level": 2
             },
             "menu1_3": {
                 "text": {
@@ -33,7 +35,7 @@
                 },
                 "hasNext": true,
                 "navActive": false,
-                "nextLength": 1,
+                "level": 2,
                 "next": {
                     "menu1_3_1": {
                         "text": {
@@ -42,7 +44,8 @@
                         },
                         "hasNext": false,
                         "liActive": "1_3_1",
-                        "path": "/content3"
+                        "path": "/content3",
+                        "level": 3
                     }
                 }
             }
@@ -55,7 +58,7 @@
         },
         "navActive": false,
         "hasNext": true,
-        "nextLength": 1,
+        "level": 1,
         "next": {
             "menu2_1": {
                 "text": {
@@ -64,7 +67,8 @@
                 },
                 "hasNext": false,
                 "path": "/content4",
-                "liActive": "2_1"
+                "liActive": "2_1",
+                "level": 2
             }
         }
     },
@@ -75,7 +79,7 @@
         },
         "navActive": false,
         "hasNext": true,
-        "nextLength": 1,
+        "level": 1,
         "next": {
             "menu3_1": {
                 "text": {
@@ -84,7 +88,8 @@
                 },
                 "hasNext": false,
                 "path": "/content5",
-                "liActive": "3_1"
+                "liActive": "3_1",
+                "level": 2
             }
         }
     },
@@ -95,7 +100,7 @@
         },
         "navActive": false,
         "hasNext": true,
-        "nextLength": 1,
+        "level": 1,
         "next": {
             "menu4_1": {
                 "text": {
@@ -104,7 +109,8 @@
                 },
                 "hasNext": false,
                 "path": "/content6",
-                "liActive": "4_1"
+                "liActive": "4_1",
+                "level": 2
             }
         }
     },
@@ -115,7 +121,7 @@
         },
         "navActive": false,
         "hasNext": true,
-        "nextLength": 1,
+        "level": 1,
         "next": {
             "menu5_1": {
                 "text": {
@@ -124,7 +130,8 @@
                 },
                 "hasNext": false,
                 "path": "/content7",
-                "liActive": "5_1"
+                "liActive": "5_1",
+                "level": 2
             }
         }
     },
@@ -135,7 +142,8 @@
         },
         "hasNext": false,
         "path": "/menu6",
-        "liActive": "6"
+        "liActive": "6",
+        "level": 1
     },
     "menu7": {
         "text": {
@@ -144,6 +152,7 @@
         },
         "hasNext": false,
         "path": "/menu7",
-        "liActive": "7"
+        "liActive": "7",
+        "level": 1
     }
 }
