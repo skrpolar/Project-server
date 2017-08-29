@@ -111,7 +111,14 @@ function searchContent(obj, content, nav, lang) {
                             coreTitle(nav, content, lang, obj[i].name, true, re3)
                                 .then(t => {
                                     var index = str.search(re2);
-                                    var n = str.substr(index, 300);
+                                    var index2 = str.search(re3);
+                                    var n = '';
+                                    if (index2 - index > 180) {
+                                        n = str.substr(index2 - 30, 300);
+                                        n = n.substr(dotCreator(n, 0));
+                                    } else {
+                                        n = str.substr(index, 300);
+                                    }
                                     var x = n.replace(re3, '<em>$&</em>');
                                     x = x.replace(/[\n]/gi, '');
                                     c.push({
@@ -134,7 +141,7 @@ function searchContent(obj, content, nav, lang) {
                         }
                         num++;
                         if (num == obj.length) {
-                            setTimeout(function() {
+                            setTimeout(function () {
                                 resolve(c);
                             }, 0);
                         }
@@ -172,6 +179,14 @@ function searchNav(obj, content, lang, name, j, re3) {
 
         searchNavInit(obj, content, lang, name, j, re3);
     });
+}
+
+function dotCreator(str, index) {
+    if (str.substr(index, 1).search(/[A-Za-z]/) !== -1) {
+        return dotCreator(str, index + 1);
+    } else {
+        return index;
+    }
 }
 
 /*
